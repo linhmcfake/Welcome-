@@ -7,6 +7,54 @@
     <title>Max - Lua Developer Profile</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: rgba(45, 45, 45, .3);
+            --bg-tertiary: rgba(26, 26, 26, .3);
+            --bg-card: rgba(45, 45, 45, .3);
+            --bg-hover: rgba(55, 55, 55, .5);
+            --text-primary: #e0e0e0;
+            --text-secondary: #ccc;
+            --text-tertiary: #aaa;
+            --text-white: #fff;
+            --border-primary: rgba(85, 85, 85, .7);
+            --border-secondary: rgba(102, 102, 102, .7);
+            --border-hover: rgba(119, 119, 119, .8);
+            --shadow-primary: rgba(0, 0, 0, .3);
+            --shadow-secondary: rgba(0, 0, 0, .4);
+            --gradient-primary: linear-gradient(135deg, rgba(26, 26, 26, .5) 0, rgba(45, 45, 45, .6) 100%);
+            --gradient-secondary: linear-gradient(135deg, rgba(45, 45, 45, .3) 0, rgba(26, 26, 26, .4) 100%);
+            --gradient-card: linear-gradient(135deg, rgba(51, 51, 51, .3), rgba(85, 85, 85, .3));
+            --gradient-card-hover: linear-gradient(135deg, rgba(68, 68, 68, .5), rgba(102, 102, 102, .5));
+            --avatar-gradient: linear-gradient(135deg, rgba(68, 68, 68, .8), rgba(102, 102, 102, .8));
+            --icon-color: #888;
+            --background-image: url(https://4kwallpapers.com/images/walls/thumbs_3t/8710.jpg);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: rgba(255, 255, 255, .3);
+            --bg-tertiary: rgba(248, 248, 248, .3);
+            --bg-card: rgba(255, 255, 255, .3);
+            --bg-hover: rgba(240, 240, 240, .5);
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-tertiary: #666;
+            --text-white: #222;
+            --border-primary: rgba(200, 200, 200, .7);
+            --border-secondary: rgba(180, 180, 180, .7);
+            --border-hover: rgba(160, 160, 160, .8);
+            --shadow-primary: rgba(0, 0, 0, .1);
+            --shadow-secondary: rgba(0, 0, 0, .15);
+            --gradient-primary: linear-gradient(135deg, rgba(255, 255, 255, .5) 0, rgba(240, 240, 240, .6) 100%);
+            --gradient-secondary: linear-gradient(135deg, rgba(255, 255, 255, .3) 0, rgba(248, 248, 248, .4) 100%);
+            --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, .3), rgba(245, 245, 245, .3));
+            --gradient-card-hover: linear-gradient(135deg, rgba(240, 240, 240, .5), rgba(235, 235, 235, .5));
+            --avatar-gradient: linear-gradient(135deg, rgba(200, 200, 200, .8), rgba(180, 180, 180, .8));
+            --icon-color: #666;
+            --background-image: url(https://4kwallpapers.com/images/walls/thumbs_3t/5664.jpg);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -25,11 +73,52 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #e0e0e0;
-            background: #1a1a1a;
+            color: var(--text-primary);
+            background: var(--bg-primary);
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 2px solid var(--border-primary);
+            border-radius: 50px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(1px);
+            box-shadow: 0 4px 15px var(--shadow-primary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle i {
+            font-size: 1.2em;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle .fa-sun {
+            display: none;
+        }
+
+        [data-theme="light"] .theme-toggle .fa-moon {
+            display: none;
+        }
+
+        [data-theme="light"] .theme-toggle .fa-sun {
+            display: inline-block;
+            color: #f39c12;
         }
 
         .background-overlay {
@@ -41,10 +130,11 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-image: url(https://4kwallpapers.com/images/walls/thumbs_3t/8710.jpg);
+            background-image: var(--background-image);
             opacity: .5;
             z-index: -2;
-            background-attachment: fixed
+            background-attachment: fixed;
+            transition: all 0.3s ease;
         }
 
         .background-overlay::after {
@@ -54,8 +144,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(26, 26, 26, .5) 0, rgba(45, 45, 45, .6) 100%);
-            z-index: 1
+            background: var(--gradient-primary);
+            z-index: 1;
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -67,13 +158,13 @@
         }
 
         .profile-card {
-            background: rgba(45, 45, 45, .3);
-            backdrop-filter: blur(8px);
+            background: var(--bg-secondary);
+            backdrop-filter: blur(1px);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, .3);
+            box-shadow: 0 20px 40px var(--shadow-primary);
             overflow: hidden;
             transition: transform .3s ease;
-            border: 1px solid rgba(85, 85, 85, .7)
+            border: 1px solid var(--border-primary)
         }
 
         .profile-card:hover {
@@ -81,13 +172,13 @@
         }
 
         .header {
-            background: linear-gradient(135deg, rgba(45, 45, 45, .3) 0, rgba(26, 26, 26, .4) 100%);
-            color: #e0e0e0;
+            background: var(--gradient-secondary);
+            color: var(--text-primary);
             padding: 40px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            border-bottom: 2px solid rgba(85, 85, 85, .7)
+            border-bottom: 2px solid var(--border-primary)
         }
 
         .header::before {
@@ -116,15 +207,15 @@
             height: 150px;
             border-radius: 50%;
             margin: 0 auto 20px;
-            background: linear-gradient(135deg, rgba(68, 68, 68, .8), rgba(102, 102, 102, .8));
+            background: var(--avatar-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 60px;
-            color: #e0e0e0;
+            color: var(--text-primary);
             position: relative;
             z-index: 1;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+            box-shadow: 0 10px 30px var(--shadow-secondary);
             transition: transform .3s ease;
             overflow: hidden
         }
@@ -146,7 +237,7 @@
             margin-bottom: 10px;
             position: relative;
             z-index: 1;
-            color: #fff
+            color: var(--text-white)
         }
 
         .title {
@@ -154,12 +245,12 @@
             opacity: .9;
             position: relative;
             z-index: 1;
-            color: #ccc
+            color: var(--text-secondary)
         }
 
         .content {
             padding: 40px;
-            background: rgba(26, 26, 26, .3)
+            background: var(--bg-tertiary)
         }
 
         .section {
@@ -196,14 +287,14 @@
             font-size: 1.8em;
             font-weight: 600;
             margin-bottom: 20px;
-            color: #fff;
+            color: var(--text-white);
             display: flex;
             align-items: center;
             gap: 10px
         }
 
         .section-title i {
-            color: #888
+            color: var(--icon-color)
         }
 
         .contact-info {
@@ -217,33 +308,33 @@
             align-items: center;
             gap: 15px;
             padding: 15px;
-            background: rgba(45, 45, 45, .3);
+            background: var(--bg-card);
             border-radius: 10px;
             transition: all .3s ease;
-            border-left: 4px solid rgba(102, 102, 102, .7);
-            border: 1px solid rgba(85, 85, 85, .7);
+            border-left: 4px solid var(--border-secondary);
+            border: 1px solid var(--border-primary);
             position: relative
         }
 
         .contact-item:hover {
-            background: rgba(55, 55, 55, .5);
+            background: var(--bg-hover);
             transform: translateX(5px);
-            border-left-color: rgba(136, 136, 136, .8)
+            border-left-color: var(--border-hover)
         }
 
         .contact-item i {
             font-size: 1.2em;
-            color: #888;
+            color: var(--icon-color);
             width: 20px
         }
 
         .contact-item a {
-            color: #aaa;
+            color: var(--text-tertiary);
             text-decoration: none
         }
 
         .contact-item a:hover {
-            color: #fff
+            color: var(--text-white)
         }
 
         .skills-grid {
@@ -253,15 +344,15 @@
         }
 
         .skill-card {
-            background: linear-gradient(135deg, rgba(51, 51, 51, .3), rgba(85, 85, 85, .3));
-            color: #e0e0e0;
+            background: var(--gradient-card);
+            color: var(--text-primary);
             padding: 25px;
             border-radius: 15px;
             text-align: center;
             transition: all .3s ease;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(102, 102, 102, .7)
+            border: 1px solid var(--border-secondary)
         }
 
         .skill-card::before {
@@ -277,7 +368,7 @@
 
         .skill-card:hover {
             transform: translateY(-5px) scale(1.05);
-            background: linear-gradient(135deg, rgba(68, 68, 68, .5), rgba(102, 102, 102, .5))
+            background: var(--gradient-card-hover)
         }
 
         .skill-card:hover::before {
@@ -289,7 +380,7 @@
             margin-bottom: 15px;
             position: relative;
             z-index: 1;
-            color: #ccc
+            color: var(--text-secondary)
         }
 
         .skill-card h3 {
@@ -297,14 +388,14 @@
             margin-bottom: 10px;
             position: relative;
             z-index: 1;
-            color: #fff
+            color: var(--text-white)
         }
 
         .skill-card p {
             opacity: .9;
             position: relative;
             z-index: 1;
-            color: #ccc
+            color: var(--text-secondary)
         }
 
         .projects-grid {
@@ -314,19 +405,19 @@
         }
 
         .project-card {
-            background: rgba(45, 45, 45, .3);
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+            box-shadow: 0 10px 30px var(--shadow-primary);
             transition: all .3s ease;
-            border: 2px solid rgba(85, 85, 85, .7);
+            border: 2px solid var(--border-primary);
             position: relative
         }
 
         .project-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(119, 119, 119, .8);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, .4)
+            border-color: var(--border-hover);
+            box-shadow: 0 20px 40px var(--shadow-secondary)
         }
 
         .project-header {
@@ -339,23 +430,23 @@
         .project-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, rgba(68, 68, 68, .8), rgba(102, 102, 102, .8));
+            background: var(--avatar-gradient);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-size: 1.5em
         }
 
         .project-title {
             font-size: 1.4em;
             font-weight: 600;
-            color: #fff
+            color: var(--text-white)
         }
 
         .project-description {
-            color: #ccc;
+            color: var(--text-secondary);
             margin-bottom: 15px
         }
 
@@ -371,47 +462,47 @@
             align-items: center;
             gap: 5px;
             font-size: .9em;
-            color: #aaa;
-            background: rgba(26, 26, 26, .4);
+            color: var(--text-tertiary);
+            background: var(--bg-tertiary);
             padding: 5px 10px;
             border-radius: 15px;
-            border: 1px solid rgba(68, 68, 68, .7)
+            border: 1px solid var(--border-primary)
         }
 
         .stat i {
-            color: #888
+            color: var(--icon-color)
         }
 
         .github-link {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, rgba(51, 51, 51, .3), rgba(85, 85, 85, .3));
-            color: #e0e0e0;
+            background: var(--gradient-card);
+            color: var(--text-primary);
             padding: 12px 20px;
             border-radius: 25px;
             text-decoration: none;
             transition: all .3s ease;
             margin-top: 20px;
-            border: 1px solid rgba(102, 102, 102, .7);
+            border: 1px solid var(--border-secondary);
             position: relative
         }
 
         .github-link:hover {
-            background: linear-gradient(135deg, rgba(68, 68, 68, .5), rgba(102, 102, 102, .5));
+            background: var(--gradient-card-hover);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, .4)
+            box-shadow: 0 5px 15px var(--shadow-secondary)
         }
 
         .about-text {
             font-size: 1.1em;
             line-height: 1.8;
-            color: #ccc;
+            color: var(--text-secondary);
             text-align: justify
         }
 
         .loading {
-            color: #888;
+            color: var(--icon-color);
             font-style: italic
         }
 
@@ -447,6 +538,12 @@
 
             .projects-grid {
                 grid-template-columns: 1fr
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 10px 12px;
             }
         }
 
@@ -492,8 +589,8 @@
         }
 
         .windows-hover-effect:hover {
-            background: rgba(55, 55, 55, .5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .3)
+            background: var(--bg-hover);
+            box-shadow: 0 8px 32px var(--shadow-primary)
         }
         .protection-overlay {
             position: fixed;
@@ -511,12 +608,17 @@
 <body>
     <div class="protection-overlay"></div>
     
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+    </div>
+    
     <div class="background-overlay" id="backgroundOverlay"></div>
     <div class="container">
         <div class="profile-card">
             <div class="header">
                 <div class="avatar pulse" id="avatar">
-                    <img src="https://avatars.githubusercontent.com/u/171395974?v=4&size=360" alt="Max Avatar" onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<i class=\'fas fa-user\'></i>\';">
+                    <img src="https://avatars.githubusercontent.com/u/171395974?v=4&size=360" alt="Max Avatar" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-user\'></i>';">
                 </div>
                 <h1 class="name">Max</h1>
                 <p class="title">Lua Developer & Script Creator</p>
@@ -567,7 +669,7 @@ Lua</div>
                         <div class="skill-card windows-hover-effect">
                             <i class="fas fa-book"></i>
                             <h3>Solo developer</h3>
-                            <p>just like many dev,i love my source.</p>
+                            <p>just like many dev,i started code without team.</p>
                         </div>
                         <div class="skill-card windows-hover-effect">
                             <i class="fa-github fab"></i>
@@ -690,47 +792,6 @@ Lua</div>
                     return false;
                 }
             }, true);
-            function clearSelection() {
-                if (window.getSelection) {
-                    window.getSelection().removeAllRanges();
-                } else if (document.selection) {
-                    document.selection.empty();
-                }
-            }
-            setInterval(clearSelection, 100);
-            let devtools = {
-                open: false,
-                orientation: null
-            };
-
-            const threshold = 160;
-
-            setInterval(function() {
-                if (window.outerHeight - window.innerHeight > threshold || 
-                    window.outerWidth - window.innerWidth > threshold) {
-                    if (!devtools.open) {
-                        devtools.open = true;
-                        document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:99999;">Developer tools detected. Access denied.</div>';
-                    }
-                } else {
-                    devtools.open = false;
-                }
-            }, 500);
-            (function() {
-                try {
-                    var $_console$$ = console;
-                    Object.defineProperty(window, "console", {
-                        get: function() {
-                            if ($_console$$._commandLineAPI)
-                                throw "Console is disabled";
-                            return $_console$$
-                        },
-                        set: function(val) {
-                            $_console$$ = val
-                        }
-                    })
-                } catch (e) {}
-            })();
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey && (e.keyCode === 85)) {
                     e.preventDefault();
@@ -746,6 +807,25 @@ Lua</div>
             }
 
         })();
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        }
+
         async function fetchGitHubProjects() {
             try {
                 const response = await fetch('https://api.github.com/users/linhmcfake/repos?sort=updated&per_page=6');
@@ -807,7 +887,7 @@ Lua</div>
                                 <span>${language}</span>
                             </div>
                         </div>
-                        <a href="${repo.html_url}" target="_blank" class="github-link" style="margin-top: 15px; display: inline-flex;">
+                        <a href="${repo.html_url}" target="_blank" class="github-link">
                             <i class="fab fa-github"></i>
                             View Repository
                         </a>
@@ -824,21 +904,28 @@ Lua</div>
         function getLanguageIcon(language) {
             const icons = {
                 'JavaScript': 'fab fa-js-square',
+                'TypeScript': 'fab fa-js-square',
                 'Python': 'fab fa-python',
                 'Java': 'fab fa-java',
-                'HTML': 'fab fa-html5',
-                'CSS': 'fab fa-css3-alt',
-                'PHP': 'fab fa-php',
                 'C++': 'fas fa-code',
-                'C': 'fas fa-code',
-                'Lua': 'fas fa-code',
-                'TypeScript': 'fas fa-code',
+                'C#': 'fas fa-code',
+                'PHP': 'fab fa-php',
+                'Ruby': 'fas fa-gem',
                 'Go': 'fas fa-code',
                 'Rust': 'fas fa-code',
                 'Swift': 'fab fa-swift',
                 'Kotlin': 'fas fa-code',
-                'Ruby': 'fas fa-gem',
-                'Shell': 'fas fa-terminal'
+                'Dart': 'fas fa-code',
+                'HTML': 'fab fa-html5',
+                'CSS': 'fab fa-css3-alt',
+                'Vue': 'fab fa-vuejs',
+                'React': 'fab fa-react',
+                'Angular': 'fab fa-angular',
+                'Lua': 'fas fa-code',
+                'Shell': 'fas fa-terminal',
+                'PowerShell': 'fas fa-terminal',
+                'Dockerfile': 'fab fa-docker',
+                'Makefile': 'fas fa-cogs'
             };
             return icons[language] || 'fas fa-file-code';
         }
@@ -846,25 +933,32 @@ Lua</div>
         function getLanguageColor(language) {
             const colors = {
                 'JavaScript': '#f1e05a',
+                'TypeScript': '#2b7489',
                 'Python': '#3572A5',
                 'Java': '#b07219',
-                'HTML': '#e34c26',
-                'CSS': '#1572B6',
-                'PHP': '#4F5D95',
                 'C++': '#f34b7d',
-                'C': '#555555',
-                'Lua': '#000080',
-                'TypeScript': '#2b7489',
+                'C#': '#239120',
+                'PHP': '#4F5D95',
+                'Ruby': '#701516',
                 'Go': '#00ADD8',
                 'Rust': '#dea584',
                 'Swift': '#ffac45',
                 'Kotlin': '#F18E33',
-                'Ruby': '#701516',
-                'Shell': '#89e051'
+                'Dart': '#00B4AB',
+                'HTML': '#e34c26',
+                'CSS': '#1572B6',
+                'Vue': '#4FC08D',
+                'React': '#61DAFB',
+                'Angular': '#DD0031',
+                'Lua': '#000080',
+                'Shell': '#89e051',
+                'PowerShell': '#012456',
+                'Dockerfile': '#384d54',
+                'Makefile': '#427819'
             };
-            return colors[language] || '#888888';
+            return colors[language] || '#586069';
         }
-        document.addEventListener('mousemove', function(e) {
+        document.addEventListener('mousemove', (e) => {
             const cards = document.querySelectorAll('.windows-hover-effect');
             cards.forEach(card => {
                 const rect = card.getBoundingClientRect();
@@ -874,9 +968,13 @@ Lua</div>
                 card.style.setProperty('--mouse-y', y + '%');
             });
         });
-        document.addEventListener('DOMContentLoaded', fetchGitHubProjects);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            fetchGitHubProjects();
+        });
     </script>
 </body>
 
 </html>
+
 Fluent UI on HTML by linhmc_new [OPEN SOURCE]
