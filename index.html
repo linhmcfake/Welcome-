@@ -10,7 +10,16 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
         }
 
         body {
@@ -486,16 +495,28 @@
             background: rgba(55, 55, 55, .5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, .3)
         }
+        .protection-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+            background: transparent;
+        }
     </style>
 </head>
 
 <body>
+    <div class="protection-overlay"></div>
+    
     <div class="background-overlay" id="backgroundOverlay"></div>
     <div class="container">
         <div class="profile-card">
             <div class="header">
                 <div class="avatar pulse" id="avatar">
-                    <i class="fas fa-user"></i>
+                    <img src="https://avatars.githubusercontent.com/u/171395974?v=4&size=360" alt="Max Avatar" onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<i class=\'fas fa-user\'></i>\';">
                 </div>
                 <h1 class="name">Max</h1>
                 <p class="title">Lua Developer & Script Creator</p>
@@ -546,7 +567,7 @@ Lua</div>
                         <div class="skill-card windows-hover-effect">
                             <i class="fas fa-book"></i>
                             <h3>Solo developer</h3>
-                            <p>i love my source</p>
+                            <p>just like many dev,i love my source.</p>
                         </div>
                         <div class="skill-card windows-hover-effect">
                             <i class="fa-github fab"></i>
@@ -558,212 +579,304 @@ Lua</div>
                 <div class="section">
                     <h2 class="section-title"><i class="fas fa-folder-open"></i> GitHub Projects</h2>
                     <div class="projects-grid" id="projectsGrid">
-                        <div class="loading">Đang tải thông tin từ GitHub...</div>
+                        <div class="loading">Loading projects...</div>
                     </div>
-                    <a href="https://github.com/linhmcfake" target="_blank" class="github-link windows-hover-effect">
-                        <i class="fa-github fab"></i> View All Projects on GitHub
+                    <a href="https://github.com/linhmcfake" target="_blank" class="github-link">
+                        <i class="fab fa-github"></i>
+                        View All Projects on GitHub
                     </a>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
-        const GITHUB_USERNAME = 'linhmcfake';
-        const GITHUB_API_BASE = 'https://api.github.com';
-
-        function initWindowsHoverEffect( ) {
-            const hoverElements = document.querySelectorAll('.windows-hover-effect');
-
-            hoverElements.forEach(element => {
-                element.addEventListener('mousemove', function(e) {
-                    const rect = this.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-                    this.style.setProperty('--mouse-x', x + '%');
-                    this.style.setProperty('--mouse-y', y + '%');
-                });
-
-                element.addEventListener('mouseleave', function() {
-                    this.style.setProperty('--mouse-x', '50%');
-                    this.style.setProperty('--mouse-y', '50%');
-                });
-            });
-        }
-
-        async function fetchGitHubUser() {
-            try {
-                const response = await fetch(`${GITHUB_API_BASE}/users/${GITHUB_USERNAME}`);
-                const userData = await response.json();
-
-                if (userData.avatar_url) {
-                    const avatar = document.getElementById('avatar');
-                    avatar.innerHTML = `<img src="${userData.avatar_url}" alt="GitHub Avatar">`;
+        (function() {
+            'use strict';
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.keyCode === 65) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                 }
-
-                return userData;
-            } catch (error) {
-                console.error('Error fetching GitHub user:', error);
-                return null;
-            }
-        }
-
-        async function fetchGitHubRepos() {
-            try {
-                const response = await fetch(`${GITHUB_API_BASE}/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=10`);
-                const repos = await response.json();
-
-                return repos;
-            } catch (error) {
-                console.error('Error fetching GitHub repos:', error);
-                return [];
-            }
-        }
-
-        async function getCommitCount(repoName) {
-            try {
-                const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_USERNAME}/${repoName}/commits?per_page=1`);
-                const linkHeader = response.headers.get('Link');
-
-                if (linkHeader) {
-                    const match = linkHeader.match(/page=(\d+)>; rel="last"/);
-                    return match ? parseInt(match[1]) : 1;
+                if (e.ctrlKey && e.keyCode === 67) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                 }
-
-                const commits = await response.json();
-                return Array.isArray(commits) ? commits.length : 0;
-            } catch (error) {
-                console.error('Error fetching commit count:', error);
-                return 0;
+                if (e.ctrlKey && e.keyCode === 86) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.keyCode === 88) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.keyCode === 83) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.keyCode === 80) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+            window.addEventListener('beforeprint', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            document.addEventListener('copy', function(e) {
+                e.clipboardData.setData('text/plain', '');
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+            document.addEventListener('mousedown', function(e) {
+                if (e.detail > 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+            function clearSelection() {
+                if (window.getSelection) {
+                    window.getSelection().removeAllRanges();
+                } else if (document.selection) {
+                    document.selection.empty();
+                }
             }
-        }
-
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-
-        function getLanguageColor(language) {
-            const colors = {
-                'Lua': '#000080',
-                'JavaScript': '#f1e05a',
-                'Python': '#3572A5',
-                'HTML': '#e34c26',
-                'CSS': '#563d7c',
-                'TypeScript': '#2b7489',
-                'Java': '#b07219',
-                'C++': '#f34b7d',
-                'C#': '#239120',
-                'PHP': '#4F5D95'
+            setInterval(clearSelection, 100);
+            let devtools = {
+                open: false,
+                orientation: null
             };
-            return colors[language] || '#666';
-        }
 
-        async function renderProjects() {
-            const projectsGrid = document.getElementById('projectsGrid');
+            const threshold = 160;
 
-            try {
-                const repos = await fetchGitHubRepos();
-
-                if (repos.length === 0) {
-                    projectsGrid.innerHTML = '<div class="error">bro cant even load project/data GitHub LMAOOOO</div>';
-                    return;
+            setInterval(function() {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:99999;">Developer tools detected. Access denied.</div>';
+                    }
+                } else {
+                    devtools.open = false;
                 }
+            }, 500);
+            (function() {
+                try {
+                    var $_console$$ = console;
+                    Object.defineProperty(window, "console", {
+                        get: function() {
+                            if ($_console$$._commandLineAPI)
+                                throw "Console is disabled";
+                            return $_console$$
+                        },
+                        set: function(val) {
+                            $_console$$ = val
+                        }
+                    })
+                } catch (e) {}
+            })();
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && (e.keyCode === 85)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            Object.defineProperty(document, 'oncontextmenu', {
+                value: function() { return false; },
+                writable: false
+            });
+            if (window.top !== window.self) {
+                window.top.location = window.self.location;
+            }
 
+        })();
+        async function fetchGitHubProjects() {
+            try {
+                const response = await fetch('https://api.github.com/users/linhmcfake/repos?sort=updated&per_page=6');
+                const repos = await response.json();
+                
+                const projectsGrid = document.getElementById('projectsGrid');
                 projectsGrid.innerHTML = '';
-
-                for (const repo of repos.slice(0, 6)) {
-                    const commitCount = await getCommitCount(repo.name);
-
+                
+                for (const repo of repos) {
                     const projectCard = document.createElement('div');
                     projectCard.className = 'project-card windows-hover-effect';
-
-                    const languageColor = getLanguageColor(repo.language);
-
+                    
+                    const language = repo.language || 'Unknown';
+                    const languageIcon = getLanguageIcon(language);
+                    let commitsCount = 0;
+                    try {
+                        const commitsResponse = await fetch(`https://api.github.com/repos/linhmcfake/${repo.name}/commits?per_page=1`);
+                        if (commitsResponse.ok) {
+                            const linkHeader = commitsResponse.headers.get('Link');
+                            if (linkHeader) {
+                                const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+                                commitsCount = match ? parseInt(match[1]) : 1;
+                            } else {
+                                const commits = await commitsResponse.json();
+                                commitsCount = commits.length;
+                            }
+                        }
+                    } catch (e) {
+                        commitsCount = 0;
+                    }
+                    
                     projectCard.innerHTML = `
                         <div class="project-header">
                             <div class="project-icon">
-                                <i class="fas fa-${repo.private ? 'lock' : 'folder-open'}"></i>
+                                <i class="${languageIcon}"></i>
                             </div>
-                            <div>
-                                <h3 class="project-title">${repo.name}</h3>
-                            </div>
+                            <div class="project-title">${repo.name}</div>
                         </div>
-                        <p class="project-description">${repo.description || 'No description available'}</p>
+                        <div class="project-description">
+                            ${repo.description || 'No description available'}
+                        </div>
                         <div class="project-stats">
                             <div class="stat">
                                 <i class="fas fa-code-branch"></i>
-                                <span>${formatNumber(commitCount)} commits</span>
+                                <span>${commitsCount} commits</span>
                             </div>
                             <div class="stat">
                                 <i class="fas fa-code-branch"></i>
-                                <span>${formatNumber(repo.forks_count)} forks</span>
+                                <span>${repo.forks_count} forks</span>
                             </div>
+                        </div>
+                        <div class="project-stats">
                             <div class="stat">
                                 <i class="fas fa-star"></i>
-                                <span>${formatNumber(repo.stargazers_count)} stars</span>
+                                <span>${repo.stargazers_count} stars</span>
                             </div>
-                            ${repo.language ? `
                             <div class="stat">
-                                <i class="fas fa-circle" style="color: ${languageColor};"></i>
-                                <span>${repo.language}</span>
+                                <i class="fas fa-circle" style="color: ${getLanguageColor(language)}"></i>
+                                <span>${language}</span>
                             </div>
-                            ` : ''}
                         </div>
-                        <a href="${repo.html_url}" target="_blank" class="github-link windows-hover-effect" style="margin-top: 15px; display: inline-flex;">
+                        <a href="${repo.html_url}" target="_blank" class="github-link" style="margin-top: 15px; display: inline-flex;">
                             <i class="fab fa-github"></i>
                             View Repository
                         </a>
                     `;
-
+                    
                     projectsGrid.appendChild(projectCard);
                 }
-
-                initWindowsHoverEffect();
             } catch (error) {
-                console.error('Error rendering projects:', error);
-                projectsGrid.innerHTML = '<div class="error">error while loading project GitHub :( </div>';
+                console.error('Error fetching GitHub projects:', error);
+                document.getElementById('projectsGrid').innerHTML = '<div class="error">Failed to load projects</div>';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchGitHubUser();
-            renderProjects();
-            initWindowsHoverEffect();
+        function getLanguageIcon(language) {
+            const icons = {
+                'JavaScript': 'fab fa-js-square',
+                'Python': 'fab fa-python',
+                'Java': 'fab fa-java',
+                'HTML': 'fab fa-html5',
+                'CSS': 'fab fa-css3-alt',
+                'PHP': 'fab fa-php',
+                'C++': 'fas fa-code',
+                'C': 'fas fa-code',
+                'Lua': 'fas fa-code',
+                'TypeScript': 'fas fa-code',
+                'Go': 'fas fa-code',
+                'Rust': 'fas fa-code',
+                'Swift': 'fab fa-swift',
+                'Kotlin': 'fas fa-code',
+                'Ruby': 'fas fa-gem',
+                'Shell': 'fas fa-terminal'
+            };
+            return icons[language] || 'fas fa-file-code';
+        }
 
-            const skillCards = document.querySelectorAll('.skill-card');
-            skillCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-10px) scale(1.05)';
-                });
-
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
+        function getLanguageColor(language) {
+            const colors = {
+                'JavaScript': '#f1e05a',
+                'Python': '#3572A5',
+                'Java': '#b07219',
+                'HTML': '#e34c26',
+                'CSS': '#1572B6',
+                'PHP': '#4F5D95',
+                'C++': '#f34b7d',
+                'C': '#555555',
+                'Lua': '#000080',
+                'TypeScript': '#2b7489',
+                'Go': '#00ADD8',
+                'Rust': '#dea584',
+                'Swift': '#ffac45',
+                'Kotlin': '#F18E33',
+                'Ruby': '#701516',
+                'Shell': '#89e051'
+            };
+            return colors[language] || '#888888';
+        }
+        document.addEventListener('mousemove', function(e) {
+            const cards = document.querySelectorAll('.windows-hover-effect');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', x + '%');
+                card.style.setProperty('--mouse-y', y + '%');
             });
-
         });
-    </script>
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-
-        document.addEventListener('keydown', e => {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-                (e.ctrlKey && e.key === 'U') ||
-                (e.ctrlKey && e.key === 'S')
-            ) {
-                e.preventDefault();
-            }
-        });
+        document.addEventListener('DOMContentLoaded', fetchGitHubProjects);
     </script>
 </body>
 
 </html>
-Fluent UI by linhmc_new (open source)
+Fluent UI on HTML by linhmc_new [OPEN SOURCE]
